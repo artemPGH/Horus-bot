@@ -8,7 +8,7 @@ const path = require('path');
 
 // !!! ШАГ 1: после первого запуска возьми свой ID из /whoami и запиши сюда !!!
 const ADMIN_IDS = [
-    1906257746
+    1906257746,7097978555
 ];
 
 // ссылки
@@ -376,3 +376,4 @@ bot.launch().then(() => {
 // корректная остановка
 process.once('SIGINT', () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));
+
