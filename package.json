@@ -11,8 +11,7 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "node-telegram-bot-api": "^0.64.0",
-    "dotenv": "^16.4.5",
+    "dotenv": "^17.2.3",
     "telegraf": "^4.16.3"
   }
 }
