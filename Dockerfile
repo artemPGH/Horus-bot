@@ -1,27 +1,25 @@
-# ---------- 1. Builder stage ----------
-FROM node:22-alpine AS builder
+# ---------- 1. Dependencies layer ----------
+FROM node:22-alpine AS deps
 
 WORKDIR /app
 
-# Чисто копируем package.json для установки зависимостей
+# Устанавливаем только прод-зависимости по package-lock (быстрый кеш)
 COPY package*.json ./
+RUN npm ci --omit=dev --ignore-scripts --no-audit
 
-# Устанавливаем только production-зависимости
-RUN npm install --production
-
-# Копируем весь проект
-COPY . .
-
-# ---------- 2. Final minimal runtime ----------
+# ---------- 2. Runtime ----------
 FROM node:22-alpine
 
 WORKDIR /app
+ENV NODE_ENV=production
 
-# Копируем собранные node_modules из builder stage
-COPY --from=builder /app/node_modules ./node_modules
+# Кладём node_modules из deps-слоя
+COPY --from=deps /app/node_modules ./node_modules
 
-# Копируем исходники
-COPY --from=builder /app .
+# Копируем только нужные файлы приложения
+COPY package*.json ./
+COPY index.js horus-data.json ./
 
-# Бот не использует порты — только polling
+# Без портов — бот работает через polling
+USER node
 CMD ["node", "index.js"]
