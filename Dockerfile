@@ -1,25 +1,17 @@
-# ---------- 1. Dependencies layer ----------
-FROM node:22-alpine AS deps
+# Используем легкую версию Node.js
+FROM node:18-alpine
 
+# Создаем директорию для приложения
 WORKDIR /app
 
-# Устанавливаем только прод-зависимости по package-lock (быстрый кеш)
+# Копируем файлы с зависимостями
 COPY package*.json ./
-RUN npm ci --omit=dev --ignore-scripts --no-audit
 
-# ---------- 2. Runtime ----------
-FROM node:22-alpine
+# Устанавливаем библиотеки (telegraf, dotenv и т.д.)
+RUN npm install
 
-WORKDIR /app
-ENV NODE_ENV=production
+# Копируем весь остальной код бота
+COPY . .
 
-# Кладём node_modules из deps-слоя
-COPY --from=deps /app/node_modules ./node_modules
-
-# Копируем только нужные файлы приложения
-COPY package*.json ./
-COPY index.js horus-data.json ./
-
-# Без портов — бот работает через polling
-USER node
+# Команда для запуска бота
 CMD ["node", "index.js"]
